@@ -29,8 +29,6 @@ video.addEventListener("play", () => {
       .withFaceDescriptors();
     const resizedDetections = faceapi.resizeResults(detections, displaySize);
     canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
-    // faceapi.draw.drawDetections(canvas, resizedDetections);
-    faceapi.draw.drawFaceLandmarks(canvas, resizedDetections);
     faceapi.draw.drawFaceExpressions(canvas, resizedDetections);
 
     const labeledFaceDescriptors = await loadLabeledImages();
@@ -54,28 +52,29 @@ video.addEventListener("play", () => {
 });
 
 function loadLabeledImages() {
-  const labels = [
-    "Ivan Kristiawan",
-    // "Black Widow",
-    // "Captain America",
-    // "Captain Marvel",
-    // "Hawkeye",
-    // "Jim Rhodes",
-    // "Thor",
-    // "Tony Stark",
-  ];
+  const labels = ["Ivan Kristiawan"];
   return Promise.all(
     labels.map(async (label) => {
       const descriptions = [];
       const img = await faceapi.fetchImage(
         `https://res.cloudinary.com/dbtag5lau/image/upload/v1683079265/Ivan%20Kristiawan.jpg`
       );
-      // const img = await faceapi.fetchImage(`https://raw.githubusercontent.com/WebDevSimplified/Face-Recognition-JavaScript/master/labeled_images/${label}/${i}.jpg`)
-      const detections = await faceapi
-        .detectSingleFace(img)
-        .withFaceLandmarks()
-        .withFaceDescriptor();
-      descriptions.push(detections.descriptor);
+      for (let i = 1; i <= 2; i++) {
+        setInterval(async () => {
+          try {
+            const img = await faceapi.fetchImage(
+              `https://raw.githubusercontent.com/IvanKristiawan/html_face_recognition/main/labeled_images/${label}/${i}.jpg`
+            );
+
+            const detections = await faceapi
+              .detectSingleFace(img)
+              .withFaceDescriptor();
+            descriptions.push(detections.descriptor);
+          } catch (error) {
+            console.log(error);
+          }
+        }, 100);
+      }
 
       return new faceapi.LabeledFaceDescriptors(label, descriptions);
     })
